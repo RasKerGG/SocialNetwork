@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../db.js';
 import bcrypt from 'bcrypt';
+import Role from './role.js';
 
 const User = sequelize.define('User', {
   name: {
@@ -32,7 +33,16 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  // пока что у пользователя не будет роли.
+  role_id:{
+    type: DataTypes.INTEGER,
+    references:{
+      model:Role,
+      key:'id'
+    },
+    allowNull:false
+  }
+  
 });
+
 
 export default User;

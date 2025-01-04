@@ -13,6 +13,8 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
+    const defaultRole = 1; // 1 - пользователь
+
     // Хэширование пароля
     const password_hash = await bcrypt.hash(password, 10);
 
@@ -25,6 +27,7 @@ export const register = async (req, res) => {
       departament,
       position,
       skills,
+      role_id: defaultRole,
     });
 
     res

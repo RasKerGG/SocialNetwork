@@ -19,11 +19,11 @@ app.use('/auth', authRoutes);
 const start = async () =>{
     try {
         await sequelize.authenticate()
-        await sequelize.sync()
+        await sequelize.sync({alter: true})
         app.listen(PORT,()=>{
             console.log(`Сервер работает на порте: ${PORT}`)
         })   
-    } catch (e) {
+    } catch (error) {
         console.log('Ошибка запуска сервера:', error.message)    
     }
 }
