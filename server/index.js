@@ -2,6 +2,10 @@ import express from 'express'
 import dotenv from 'dotenv'
 import sequelize  from './db.js'
 import authRoutes from './routes/authRoutes.js'; 
+import User from './models/user.js';
+import Post from './models/post.js';
+import Like from './models/like.js';
+import Comment from './models/comment.js';
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 3000;
