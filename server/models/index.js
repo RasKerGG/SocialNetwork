@@ -12,7 +12,7 @@ Role.hasMany(User,{
     foreignKey: 'role_id',
     as: 'users'
 })
-//Посты
+//  ПОСТЫ
 //Связь пользователя с постом (один ко многим)
 User.hasMany(Post,{
   foreignKey: 'author_id',
@@ -23,6 +23,7 @@ Post.belongsTo(User,{
   foreignKey: 'author_id',
   as: 'author'
 })
+
 // связь лайков
 Like.belongsTo(User,{ 
     foreignKey: 'user_id', 
@@ -33,6 +34,7 @@ Like.belongsTo(Post, {
   foreignKey: 'post_id', 
   as: 'post' 
 });
+
 // связь с комментариями
 Comment.belongsTo(User, { 
   foreignKey: 'user_id', 
