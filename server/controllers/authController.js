@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt"; //модель и bcrypt
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv'
+import {validationResult} from 'express-validator';
 
 dotenv.config()
 const JWT_SECRET_KEY = process.env.JWT_SECRET
@@ -60,6 +61,10 @@ export const register = async (req, res) => {
 // Логин пользователя
 export const login = async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { email, password } = req.body;
 
     // Проверка существования пользователя

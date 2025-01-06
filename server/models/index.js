@@ -1,10 +1,12 @@
 import Post from "./post.js";
 import User from "./user.js";
-import Role from "./user.js";
+import Role from "./role.js";
+import Like from "./like.js";
+import Comment from "./comment.js";
 
 // Связь пользователя с ролью (один ко многим)
-User.BelongsTo(Role,{
-    foreignkey: 'role_id',
+User.belongsTo(Role,{
+    foreignKey: 'role_id',
     as: 'role'
   })
 

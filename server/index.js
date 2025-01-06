@@ -7,6 +7,7 @@ import User from './models/user.js';
 import Post from './models/post.js';
 import Like from './models/like.js';
 import Comment from './models/comment.js';
+import './models/index.js';
 dotenv.config()
 const app = express()
 
