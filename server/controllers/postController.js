@@ -1,13 +1,5 @@
 import User from "../models/user.js";
 import Post from "../models/post.js";
-
-// export const getAllPosts = async(req,res) =>{
-//     try {
-//         res.send("Лента постов")
-//     } catch (error) {
-        
-//     }
-// }
 export const createPost = async(req,res) =>{
         try {
             const { content } = req.body;
@@ -24,7 +16,7 @@ export const createPost = async(req,res) =>{
             res.status(500).json({ error: error.message });
           }
 }
-export const getAllPosts = async (req, res) => {
+export const getAllPosts = async (req, res) => { // лента постов
     try {
       const posts = await Post.findAll({
         include: [{ model: User, as:'author', attributes: ['name', 'email'] }] // данные автора
@@ -34,3 +26,65 @@ export const getAllPosts = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
+export const getOnePost = async(req,res) =>{
+    try {
+      const {id} = req.params;
+      const post = await Post.findOne({ where: {id}})
+
+      if(!post){
+        return res.status(404).json({message:"Post not found"})
+      }
+
+      return res.status(200).json({post})
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+
+    }
+}
+export const updatePost = async(req,res) =>{
+
+  try {
+    const {id} = req.params;
+    const { id: user_id } = req.user;  // достаем из токена
+    const {content} = req.body;
+
+    const post = await Post.findOne({ where: {id}});
+
+    if(!post){
+      return res.status(404).json({message:"Post not found"})
+    }
+    if(post.author_id !== user_id ){
+      return res.status(403).json({message:"You are not the author of this post"})
+    }
+
+   post.content = content || post.content; 
+   await post.save()
+   return res.status(200).json(post)
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+    
+}
+export const removePost = async(req,res) => {
+  try {
+    const {id} = req.params;
+    const { id: user_id } = req.user;
+  
+    const post = await Post.findOne({where:{id}});
+  
+    if(!post){
+      return res.status(404).json({message:"Post not found"})
+    }
+    if(post.author_id !== user_id){
+      return res.status(403).json({message:"You are not the author of this post"})
+    }
+  
+    await post.destroy()
+    return res.status(200).json({message:"The post was successfully deleted"})
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+ 
+} 

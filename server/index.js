@@ -24,7 +24,7 @@ app.use('/posts',postRoutes);
 
 
 
-const start = async () =>{
+const start = async () =>{ // БД + сервер
     try {
         await sequelize.authenticate()
         await sequelize.sync({alter: true,logging:false})

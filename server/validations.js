@@ -6,3 +6,8 @@ export const loginValidation = [
     min: 5,
   }),
 ];
+export const postValidation = [
+  body("content","Контент поста должен быть минимум 1 символ").isLength({
+    min: 1,
+  })
+]
