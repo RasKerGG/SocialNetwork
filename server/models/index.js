@@ -2,6 +2,7 @@ import Post from "./post.js";
 import User from "./user.js";
 import Role from "./role.js";
 import Like from "./like.js";
+import File from "./file.js";
 import Comment from "./comment.js";
 
 // Связь пользователя с ролью (один ко многим)
@@ -47,6 +48,15 @@ Comment.belongsTo(Post, {
   as: 'post' 
 });   
 
+//связь с файлами
+User.hasMany(File,{
+  foreignKey: 'author_id',
+  as: 'files'
+})
 
+File.belongsTo(User,{
+  foreignKey: 'author_id',
+  as: 'author'
+})
 
 //другие связи
