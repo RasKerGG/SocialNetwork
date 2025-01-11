@@ -16,7 +16,11 @@ const Post = sequelize.define('Post',{
           key:'id'
         },
         allowNull:false
-    }
+    },
+    likeCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0, 
+    },
 })
 
 export default Post
