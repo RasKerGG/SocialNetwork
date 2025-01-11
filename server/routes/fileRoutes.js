@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadFile,downloadFile } from '../controllers/fileController.js';
+import { uploadFile,downloadFile,getAllFiles,getOneFile } from '../controllers/fileController.js';
 import multer from 'multer';
 import path from 'path';
 import { checkAuth } from '../checkAuth.js';
@@ -26,5 +26,9 @@ const router_file = express.Router();
 router_file.post('/upload',checkAuth, upload.single('file'), uploadFile);
 
 router_file.get('/download/:fileId',checkAuth,downloadFile);
+
+router_file.get('',getAllFiles)
+
+router_file.get('/file/:fileId',getOneFile);
 
 export default router_file;

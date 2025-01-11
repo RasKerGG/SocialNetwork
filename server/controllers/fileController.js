@@ -2,13 +2,14 @@ import File from "../models/file.js";
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';  // Для получения пути из import.meta.url
+import { Model } from "sequelize";
+import User from "../models/user.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const uploadFile = (req, res) => {
     const { file } = req;
-    const { category } = req.body;
   
     if (!file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -30,7 +31,7 @@ export const uploadFile = (req, res) => {
   };
 
   export const downloadFile = async (req, res) => {
-    const { fileId } = req.params;  // Получаем ID файла из параметров запроса
+    const { fileId } = req.params;  
 
     try {
         // Ищем файл в базе данных по ID
@@ -40,29 +41,71 @@ export const uploadFile = (req, res) => {
             return res.status(404).json({ error: 'File not found in database' });
         }
 
-        // Строим путь к файлу, убираем лишний "uploads/knowledge/"
-        const filePath = path.join(__dirname, '..', fileRecord.path);  // Путь без повторяющихся каталогов
-        console.log('File path:', filePath);  // Логируем путь к файлу
+       
+        const filePath = path.join(__dirname, '..', fileRecord.path);  
+        console.log('File path:', filePath);  
 
         try {
-            // Проверяем, существует ли файл на сервере
-            await fs.promises.access(filePath, fs.constants.F_OK);  // Проверка на существование файла
+         
+            await fs.promises.access(filePath, fs.constants.F_OK);  
 
             // Отдаем файл пользователю
             return res.download(filePath, fileRecord.name, (err) => {
                 if (err) {
-                    console.error("Download error:", err);  // Логируем ошибку
+                    console.error("Download error:", err);  
                     return res.status(500).json({ error: 'Error downloading file' });
                 }
             });
 
         } catch (err) {
-            console.error('File not found on server:', err);  // Логируем ошибку
+            console.error('File not found on server:', err); 
             return res.status(404).json({ error: 'File not found on server' });
         }
 
     } catch (error) {
-        console.error('Error retrieving file from database:', error);  // Логируем ошибку
+        console.error('Error retrieving file from database:', error);  
         return res.status(500).json({ error: 'Error retrieving file from database' });
     }
 };
+
+export const getAllFiles = async(req,res) =>{
+    try {
+      const files = await File.findAll({})
+      res.json(files);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+}
+
+export const getOneFile = async(req,res) =>{
+  try {
+    const {fileId} = req.params;
+    const file = await File.findOne({
+      where:{id:fileId},
+      include:{
+        model:User,
+        as:'author',
+        attributes: ['id','name','email']
+      }
+    
+    })
+    if(!file){
+      return res.status(404).json({message:"file not found"})
+    }
+
+    const fileResponse = {
+      id: file.id,
+      name: file.name,
+      path: file.path,
+      author: file.author ? {  
+        name: file.author.name,
+        email: file.author.email,
+      } : null,
+      createdAt: file.createdAt,
+      updatedAt: file.updatedAt,                  
+    };
+    res.json(fileResponse)
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
