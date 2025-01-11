@@ -1,7 +1,12 @@
 import User from "../models/user.js";
 import Post from "../models/post.js";
+import { validationResult } from "express-validator";
 export const createPost = async(req,res) =>{
         try {
+          const errors = validationResult(req);
+          if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+          }
             const { content } = req.body;
             const { id: user_id } = req.user;  // достаем из токена
         
@@ -44,6 +49,10 @@ export const getOnePost = async(req,res) =>{
 export const updatePost = async(req,res) =>{
 
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const {id} = req.params;
     const { id: user_id } = req.user;  // достаем из токена
     const {content} = req.body;
