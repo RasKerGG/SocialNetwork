@@ -3,7 +3,8 @@ import dotenv from 'dotenv'
 import sequelize  from './db.js'
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
-import fileRoutes from './routes/fileRoutes.js' 
+import fileRoutes from './routes/fileRoutes.js';
+import meetingRoutes from './routes/meetingRoutes.js';
 import User from './models/user.js';
 import Post from './models/post.js';
 import Like from './models/like.js';
@@ -14,7 +15,6 @@ const app = express()
 //константы для сервера
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.DB_HOST||'localhost';
-
 app.use(express.json()); //чтобы тестить через постман
 
 //роуты
@@ -25,6 +25,7 @@ app.get('/',function(req,res){
 app.use('/auth', authRoutes);
 app.use('/posts',postRoutes);
 app.use('/files', fileRoutes);
+app.use('/meetings',meetingRoutes)
 
 
 //запуск сервера

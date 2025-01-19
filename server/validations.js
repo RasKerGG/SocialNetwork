@@ -17,3 +17,10 @@ export const commentValidation = [
     min: 1,
   })
 ]
+
+export const meetingValidation = [
+  body("title","Название встречи должно содержать хотя бы 5 символов.").isLength({
+    min: 5
+  }),
+  body("start_time","Необходимо указать время встречи").notEmpty(),
+]

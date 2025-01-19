@@ -3,6 +3,8 @@ import User from "./user.js";
 import Role from "./role.js";
 import Like from "./like.js";
 import File from "./file.js";
+import Meeting from "./meeting.js";
+import UserMeetings from './userMeetings.js'; 
 import Comment from "./comment.js";
 
 // Связь пользователя с ролью (один ко многим)
@@ -57,6 +59,18 @@ User.hasMany(File,{
 File.belongsTo(User,{
   foreignKey: 'author_id',
   as: 'author'
+})
+// связь с встречей(или ивентом) и промежуточная таблица для встреч, потому что может быть несколько пользователей
+User.belongsToMany(Meeting,{
+  through: UserMeetings,
+  as: 'meetings',
+  foreignKey: 'user_id',
+})
+
+Meeting.belongsToMany(User,{
+  through: UserMeetings,
+  as: 'participants',
+  foreignKey: 'meeting_id'
 })
 
 //другие связи
