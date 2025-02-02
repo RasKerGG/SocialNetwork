@@ -6,6 +6,8 @@ import File from "./file.js";
 import Meeting from "./meeting.js";
 import UserMeetings from './userMeetings.js'; 
 import Comment from "./comment.js";
+import Chat from "./chat.js";
+import ChatParticipant from "./chatParticipant.js"
 
 // Связь пользователя с ролью (один ко многим)
 User.belongsTo(Role,{
@@ -72,5 +74,21 @@ Meeting.belongsToMany(User,{
   as: 'participants',
   foreignKey: 'meeting_id'
 })
+
+//связи для мессенджера
+
+Chat.hasMany(ChatParticipant, { 
+    foreignKey: 'chatId', 
+    as: 'participants' 
+});
+ChatParticipant.belongsTo(Chat, { 
+  foreignKey: 'chatId', 
+  as: 'chat'
+});
+ChatParticipant.belongsTo(User, {  // связь с моделью User
+  foreignKey: 'userId', // поле userId, которое ссылается на модель User
+  as: 'user',
+});
+
 
 //другие связи

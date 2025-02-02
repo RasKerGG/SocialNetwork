@@ -5,11 +5,13 @@ import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import fileRoutes from './routes/fileRoutes.js';
 import meetingRoutes from './routes/meetingRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 import User from './models/user.js';
 import Post from './models/post.js';
 import Like from './models/like.js';
 import Comment from './models/comment.js';
 import './models/index.js';
+import chat_router from './routes/chatRoutes.js';
 dotenv.config()
 const app = express()
 //константы для сервера
@@ -26,6 +28,7 @@ app.use('/auth', authRoutes);
 app.use('/posts',postRoutes);
 app.use('/files', fileRoutes);
 app.use('/meetings',meetingRoutes)
+app.use('/messenger',chatRoutes)
 
 
 //запуск сервера
