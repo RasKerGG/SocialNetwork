@@ -3,6 +3,7 @@ import User from "./user.js";
 import Role from "./role.js";
 import Like from "./like.js";
 import File from "./file.js";
+import Message from "./message.js";
 import Meeting from "./meeting.js";
 import UserMeetings from './userMeetings.js'; 
 import Comment from "./comment.js";
@@ -77,6 +78,7 @@ Meeting.belongsToMany(User,{
 
 //связи для мессенджера
 
+  //чаты и пользователи
 Chat.hasMany(ChatParticipant, { 
     foreignKey: 'chatId', 
     as: 'participants' 
@@ -89,6 +91,12 @@ ChatParticipant.belongsTo(User, {  // связь с моделью User
   foreignKey: 'userId', // поле userId, которое ссылается на модель User
   as: 'user',
 });
+  // сообщения
+Message.belongsTo(Chat, { foreignKey: "chat_id", as: "chat" });
+Message.belongsTo(User, { foreignKey: "sender_id", as: "sender" });
+Chat.hasMany(Message, { foreignKey: "chat_id", as: "messages" });
+User.hasMany(Message, { foreignKey: "sender_id", as: "messages" });
+
 
 
 //другие связи

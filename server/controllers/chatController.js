@@ -271,4 +271,28 @@ export const getChatById = async (req, res) => {
 };
 
 
+export const getUserChats = async (req, res) => {
+    const { id: user_id } = req.user; 
+
+    try {
+        // Получаем все чаты, c отбором по пользователю
+        const chats = await Chat.findAll({
+            include: [
+                {
+                    model: ChatParticipant,
+                    as: 'participants',
+                    where: { userId: user_id }, // Фильтр по пользователю
+                    attributes: [], // Исключаем ненужные поля
+                },
+            ],
+        });
+
+        res.json(chats);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching user chats', error });
+    }
+};
+
+
 

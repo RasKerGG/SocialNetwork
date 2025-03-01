@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chatBox { border: 1px solid #ccc; padding: 20px; margin-top: 20px; height: 400px; overflow-y: auto; }
+        .message { margin-bottom: 10px; padding: 8px; border-radius: 5px; }
+        .own-message { background: #e3f2fd; margin-left: 20%; }
+        .other-message { background: #f5f5f5; margin-right: 20%; }
+        #messageInput { width: 70%; padding: 10px; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test Messenger</h1>
+    
+    <!-- Токен и подключение -->
+    <div>
+        <input type="text" id="tokenInput" placeholder="Enter JWT token" style="width: 300px;">
+        <button onclick="connectSocket()">Connect</button>
+    </div>
+
+    <!-- Выбор чата -->
+    <div style="margin: 20px 0;">
+        <input type="text" id="chatIdInput" placeholder="Enter Chat ID">
+        <button onclick="selectChat()">Select Chat</button>
+    </div>
+
+    <!-- Окно чата -->
+    <div id="chatBox"></div>
+    
+    <!-- Ввод сообщения -->
+    <div style="margin-top: 20px;">
+        <input type="text" id="messageInput" placeholder="Type message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        let socket = null;
+        let currentChatId = null;
+
+        // Подключение к сокету
+        function connectSocket() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) return alert('Enter JWT token!');
+
+            socket = io('http://localhost:5000', {
+                auth: { token }
+            });
+
+            socket.on('connect', () => {
+                console.log('Connected!');
+                socket.emit('joinChats');
+            });
+
+            socket.on('newMessage', (message) => {
+                const isOwn = message.sender.id === socket.auth.token.decoded?.id;
+                addMessageToUI(message, isOwn);
+            });
+
+            socket.on('connect_error', (err) => {
+                console.error('Connection error:', err);
+                alert('Connection failed: ' + err.message);
+            });
+        }
+
+        // Выбор чата
+        function selectChat() {
+            currentChatId = document.getElementById('chatIdInput').value;
+            if (!currentChatId) return alert('Enter Chat ID!');
+            document.getElementById('chatBox').innerHTML = '';
+            console.log(currentChatId);
+            console.log('Selected chat:', currentChatId);
+            loadChatHistory();
+        }
+
+        // Отправка сообщения
+        function sendMessage() {
+            if (!socket) return alert('Connect first!');
+            if (!currentChatId) return alert('Select chat first!');
+            
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            if (!content) return;
+
+            socket.emit('sendMessage', { 
+                chatId: currentChatId, 
+                content 
+            }, (response) => {
+                if (response.error) {
+                    alert('Error: ' + response.error);
+                } else {
+                    input.value = '';
+                }
+            });
+        }
+
+        // Отображение сообщений
+        function addMessageToUI(message, isOwn) {
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            
+            messageDiv.className = `message ${isOwn ? 'own-message' : 'other-message'}`;
+            messageDiv.innerHTML = `
+                <strong>${message.sender.name}:</strong>
+                <p>${message.content}</p>
+                <small>${new Date(message.createdAt).toLocaleTimeString()}</small>
+            `;
+            
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Отправка по Enter
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function loadChatHistory() {
+    if (!currentChatId) return;
+    
+    try {
+        const token = document.getElementById('tokenInput').value;
+        if (!token) throw new Error('Требуется авторизация!');
+        
+        const response = await fetch(`http://localhost:5000/messenger/${currentChatId}/messages`, {
+            //http://localhost:5000/messenger/9/messages
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Ошибка загрузки истории');
+        }
+        
+        const messages = await response.json();
+        document.getElementById('chatBox').innerHTML = '';
+        messages.forEach(msg => {
+            const isOwn = msg.sender.id === socket.user.id;
+            addMessageToUI(msg, isOwn);
+        });
+        
+    } catch (error) {
+        console.error('Ошибка загрузки истории:', error);
+        alert(error.message);
+    }
+}  
+    </script>
+</body>
+</html>
