@@ -17,6 +17,9 @@ import http from "http"; // Добавляем http-сервер
 import jwt from 'jsonwebtoken'
 import {authenticateSocket} from './authenticateSocket.js'
 import ChatParticipant from './models/chatParticipant.js'
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import profile_router from './routes/profileRoutes.js';
 
 dotenv.config();
 
@@ -37,7 +40,16 @@ app.use('/posts', postRoutes);
 app.use('/files', fileRoutes);
 app.use('/meetings', meetingRoutes);
 app.use('/messenger', chatRoutes); // чаты+сообщения в одном роуте
+app.use('/profile',profile_router)
 
+//обслуживание статичных файлов,доступ по url
+// Получаем __filename (путь к текущему файлу)
+const __filename = fileURLToPath(import.meta.url);
+
+// Получаем __dirname (путь к папке текущего файла)
+const __dirname = dirname(__filename);
+
+app.use('/uploads', express.static(join(__dirname, 'uploads')));
 
 //функционал мессенджера
 // После создания HTTP сервера

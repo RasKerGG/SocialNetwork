@@ -17,6 +17,7 @@ const generateToken = (user) => {
 // Регистрация пользователя
 export const register = async (req, res) => {
   try {
+    console.log(req.file);
     const { name, surname, email, password, departament, position, skills } =
       req.body;
 
@@ -31,6 +32,12 @@ export const register = async (req, res) => {
     // Хэширование пароля
     const password_hash = await bcrypt.hash(password, 10);
 
+    let avatarPath = null;
+    if (req.file) {
+      avatarPath = req.file.path;
+      console.log(avatarPath)
+    }
+
     // Создание пользователя
     const user = await User.create({
       name,
@@ -41,12 +48,12 @@ export const register = async (req, res) => {
       position,
       skills,
       role_id: defaultRole,
+      avatar: avatarPath,
     });
 
     // Генерация токена
     const token = generateToken(user);
 
-   
     const { password_hash:_, ...userData } = user.dataValues; 
 
     // Отправка успешного ответа

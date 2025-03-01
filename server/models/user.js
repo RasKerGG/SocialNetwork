@@ -40,8 +40,11 @@ const User = sequelize.define('User', {
       key:'id'
     },
     allowNull:false
+  },
+  avatar:{
+    type: DataTypes.STRING,
+    allowNull:true
   }
-  
 });
 
 
