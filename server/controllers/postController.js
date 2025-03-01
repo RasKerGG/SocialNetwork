@@ -1,6 +1,14 @@
 import User from "../models/user.js";
 import Post from "../models/post.js";
 import { validationResult } from "express-validator";
+import path from 'path';
+import { fileURLToPath } from 'url'; 
+import fs from 'fs';
+
+
+const __filename = fileURLToPath(import.meta.url); // Полный путь к текущему файлу
+const __dirname = path.dirname(__filename); // Директория текущего файла
+
 export const createPost = async(req,res) =>{
         try {
           const errors = validationResult(req);
@@ -10,10 +18,16 @@ export const createPost = async(req,res) =>{
             const { content } = req.body;
             const { id: user_id } = req.user;  // достаем из токена
         
+            let imagePath = null;
+            if (req.file) {
+              imagePath = req.file.path;
+              console.log(imagePath)
+            }
             // Создаем пост с привязкой к пользователю
             const newPost = await Post.create({
               content,
               author_id: user_id,
+              image: imagePath
             });
         
             res.status(201).json({ message: "Post created", post: newPost });
@@ -67,7 +81,23 @@ export const updatePost = async(req,res) =>{
     }
 
    post.content = content || post.content; 
+
+   // Если загружено новое изображение
+   if (req.file) {
+    // Удаляем старое изображение, если оно существует
+    if (post.image) {
+      const oldImagePath = path.join(__dirname, '..', post.image); // Полный путь к старому изображению
+      fs.unlink(oldImagePath, (err) => {
+        if (err) {
+          console.error('Failed to delete old image:', err);
+        }
+      });
+    }
+    post.image = req.file.path;
+  }
+
    await post.save()
+
    return res.status(200).json(post)
 
   } catch (error) {

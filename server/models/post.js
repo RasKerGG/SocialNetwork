@@ -9,6 +9,10 @@ const Post = sequelize.define('Post',{
       allowNull:false
       
     },
+    image:{
+      type:DataTypes.STRING,
+      allowNull: true
+    },
     author_id:{
         type: DataTypes.INTEGER,
         references:{
